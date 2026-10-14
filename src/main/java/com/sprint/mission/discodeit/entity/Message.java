@@ -10,7 +10,6 @@ public class Message extends BaseEntity {
 
     public Message(String content, UUID userId, UUID channelId) {
         super();
-
         this.content = content;
         this.userId = userId;
         this.channelId = channelId;
