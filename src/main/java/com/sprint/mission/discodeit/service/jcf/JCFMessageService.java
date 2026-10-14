@@ -1,13 +1,18 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
 
@@ -21,37 +26,73 @@ public class JCFMessageService implements MessageService {
         this.userService = userService;
         this.channelService = channelService;
     }
+
     @Override
     public Message create(String content, UUID userId, UUID channelId) {
-        if (userService.findById(userId) == null) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("메시지 내용을 입력해야 합니다.");
         }
-        if (channelService.findById(channelId) == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+
+        User user = userService.findById(userId);
+        Channel channel = channelService.findById(channelId);
+
+        if (!channel.getMemberIds().contains(userId)) {
+            throw new IllegalArgumentException("채널에 참여한 사용자만 메시지를 작성할 수 있습니다.");
         }
 
         Message message = new Message(content, userId, channelId);
+
         data.put(message.getId(), message);
+
+        user.addMessage(message.getId());
+        channel.addMessage(message.getId());
+
         return message;
     }
+
     @Override
     public Message findById(UUID id) {
-        return data.get(id);
+
+        Message message = data.get(id);
+
+        if (message == null) {
+            throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+        }
+
+        return message;
     }
+
     @Override
     public List<Message> findAll() {
         return new ArrayList<>(data.values());
     }
+
     @Override
-    public void update(UUID id, String content) {
-        Message message = data.get(id);
-        if (message == null) {
-            throw new IllegalArgumentException("메세지를 찾을 수 없습니다.");
+    public Message update(UUID id, String content) {
+
+        Message message = findById(id);
+
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("메시지 내용을 입력해야 합니다.");
         }
+
         message.update(content);
+
+        return message;
     }
+
     @Override
     public void delete(UUID id) {
+
+        Message message = findById(id);
+
+        User user = userService.findById(message.getUserId());
+        Channel channel = channelService.findById(message.getChannelId());
+
         data.remove(id);
+
+        user.removeMessage(id);
+        channel.removeMessage(id);
     }
 }
