@@ -137,6 +137,29 @@ public class JavaApplication {
         Message updatedMessage = messageService.findById(message.getId());
         printMessage(updatedMessage);
 
+        System.out.println("\n========== 관계 검증 ==========");
+
+        try {
+            messageService.create(
+                    "테스트 메시지",
+                    UUID.randomUUID(),
+                    channel.getId()
+            );
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("사용자 검증: " + e.getMessage());
+        }
+
+        try {
+            messageService.create(
+                    "테스트 메시지",
+                    user.getId(),
+                    UUID.randomUUID()
+            );
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("채널 검증: " + e.getMessage());
+        }
 
         System.out.println("========== 삭제 테스트 ==========");
 
@@ -195,7 +218,6 @@ public class JavaApplication {
         System.out.println("이메일: " + user.getEmail());
         System.out.println("생성 시간: " + user.getCreatedAt());
         System.out.println("수정 시간: " + user.getUpdatedAt());
-        System.out.println("------------------------------");
     }
 
 
