@@ -16,11 +16,9 @@ public class User extends BaseEntity {
 
     public User(String username, String email, String password) {
         super();
-
         this.username = username;
         this.email = email;
         this.password = password;
-
         this.channelIds = new LinkedHashSet<>();
         this.messageIds = new LinkedHashSet<>();
     }
@@ -49,7 +47,6 @@ public class User extends BaseEntity {
         this.username = username;
         this.email = email;
         this.password = password;
-
         updateTimestamp();
     }
 
