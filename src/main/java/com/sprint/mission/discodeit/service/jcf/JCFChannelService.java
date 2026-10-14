@@ -91,6 +91,8 @@ public class JCFChannelService implements ChannelService {
 
         channel.addMember(userId);
         user.addChannel(channelId);
+
+        userService.save(user);
     }
 
     @Override
@@ -103,8 +105,18 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("참여하지 않은 사용자입니다.");
         }
 
+        if (!channel.getMessageIds().isEmpty()) {
+            for (UUID messageId : user.getMessageIds()) {
+                if (channel.getMessageIds().contains(messageId)) {
+                    throw new IllegalStateException("채널에 작성한 메시지가 남아 있어 탈퇴할 수 없습니다.");
+                }
+            }
+        }
+
         channel.removeMember(userId);
         user.removeChannel(channelId);
+
+        userService.save(user);
     }
 
     private void validateChannel(String name, String description, UUID excludeId) {
