@@ -6,10 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
+
     Message create(String content, UUID userId, UUID channelId);
+
     Message findById(UUID id);
+
     List<Message> findAll();
 
-    void update(UUID id, String content);
+    Message update(UUID id, String content);
+
     void delete(UUID id);
 }
