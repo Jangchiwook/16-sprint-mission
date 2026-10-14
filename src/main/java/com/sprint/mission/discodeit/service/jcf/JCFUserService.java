@@ -55,6 +55,8 @@ public class JCFUserService implements UserService {
 
         user.update(username, email.trim(), password);
 
+        data.put(user.getId(), user);
+
         return user;
     }
 
@@ -72,6 +74,18 @@ public class JCFUserService implements UserService {
         }
 
         data.remove(id);
+    }
+
+    @Override
+    public void save(User user) {
+
+        if (user == null) {
+            throw new IllegalArgumentException("사용자 정보가 없습니다.");
+        }
+
+        findById(user.getId());
+
+        data.put(user.getId(), user);
     }
 
     private void validateUser(String username, String email, String password, UUID excludeId) {
